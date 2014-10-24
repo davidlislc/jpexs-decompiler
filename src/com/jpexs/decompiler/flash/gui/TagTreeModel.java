@@ -88,14 +88,29 @@ public class TagTreeModel implements TreeModel {
         }
     }
 
+    public TagTreeModel(SWF swf) {
+        this.mainFrame = null;
+        this.swfs = new ArrayList<>();
+        swfToSwfNode = new HashMap<>();
+        //this.swfs.add(createSwfNode(swf));
+
+    }
+
     public SWFNode createSwfNode(SWF swf) {
         SWFNode swfNode = createTagList(swf.tags, swf);
         swfToSwfNode.put(swf, swfNode);
         return swfNode;
     }
 
+    public SWFNode createSwfNodeforexp(SWF swf) {
+        SWFNode swfNode = createTagList(swf.tags, swf);
+
+        return swfNode;
+    }
+
     private String translate(String key) {
-        return mainFrame.translate(key);
+        return key;
+        //return mainFrame.translate(key);
     }
 
     private List<TreeNode> getSoundStreams(DefineSpriteTag sprite) {
@@ -107,6 +122,8 @@ public class TagTreeModel implements TreeModel {
         }
         return ret;
     }
+    public List<Tag> soundsTags = new ArrayList<Tag>();
+    public StringNode shapesNode;
 
     private SWFNode createTagList(List<Tag> list, SWF swf) {
         ClassesListTreeModel classTreeModel = new ClassesListTreeModel(swf);
@@ -134,6 +151,9 @@ public class TagTreeModel implements TreeModel {
 
         for (Tag t : list) {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
+            if (ttype.equals(TreeNodeType.SOUND)) {
+                System.out.println(ttype.name());
+            }
             switch (ttype) {
                 case SHAPE:
                     shapes.add(new TagNode(t));
@@ -161,6 +181,8 @@ public class TagTreeModel implements TreeModel {
                     movies.add(new TagNode(t));
                     break;
                 case SOUND:
+                    System.out.println(t.getId());
+                    soundsTags.add(t);
                     sounds.add(new TagNode(t));
                     break;
                 case BINARY_DATA:
@@ -189,7 +211,9 @@ public class TagTreeModel implements TreeModel {
                 }
             }
         }
-
+        for (TreeNode sound : sounds) {
+            this.soundsTags.add((Tag) sound.getItem());
+        }
         for (TreeNode n : sprites) {
             Timelined timelined = n.getItem() instanceof Timelined ? (Timelined) n.getItem() : null;
             n.subNodes = createSubTagList(((DefineSpriteTag) n.getItem()).subTags, timelined, swf, actionScriptTags);
@@ -216,7 +240,7 @@ public class TagTreeModel implements TreeModel {
         StringNode spritesNode = new StringNode(new StringItem(translate("node.sprites"), FOLDER_SPRITES, swf));
         spritesNode.subNodes.addAll(sprites);
 
-        StringNode shapesNode = new StringNode(new StringItem(translate("node.shapes"), FOLDER_SHAPES, swf));
+        shapesNode = new StringNode(new StringItem(translate("node.shapes"), FOLDER_SHAPES, swf));
         shapesNode.subNodes.addAll(shapes);
 
         StringNode morphShapesNode = new StringNode(new StringItem(translate("node.morphshapes"), FOLDER_MORPHSHAPES, swf));

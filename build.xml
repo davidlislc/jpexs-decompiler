@@ -57,7 +57,8 @@
     
     <property name="REVFILE" value="${basedir}/revision.txt"/>
     
-    <property name="RUNPARAMS" value=""/>
-    
+    <property name="RUNPARAMS" value="-format shape:png  -export all 'C:\swf\input' c:\swf\pngoutput"/>
+    <!--      <property name="RUNPARAMS" value="-format shape:png  -export all '.' c:\10.swf "/>
+  -->
     <import file="${basedir}/build_common.xml"/>
 </project>
